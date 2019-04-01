@@ -1,0 +1,21 @@
+drop database ebill;
+
+create database ebill;
+
+use ebill;
+
+create table customers(cnumber varchar(50) primary key,cname varchar(70) not null,cid varchar(20) unique,mobile varchar(20) not null,address varchar(150) not null);
+
+drop table bill;
+
+create table bill(cnumber varchar(50),Billnumber varchar(50),units bigint(20) not null,date int,billAmount double(10,2) not null,status varchar(7) not null,primary key(billnumber),FOREIGN KEY(cnumber) REFERENCES customers(cnumber));
+
+
+alter table bill alter status SET DEFAULT 'NOTPAID';
+
+
+alter table bill alter date SET DEFAULT getdate();
+
+create table totalunits(cnumber varchar(50) not null,totalunits bigint(20) not null,FOREIGN KEY (cnumber) REFERENCES customers(cnumber));
+
+alter table totalunits alter totalunits SET DEFAULT 0;
