@@ -16,7 +16,7 @@ public class EBillDaoImpl implements EBillDao {
 	private ResultSet rs;
 
 	@Override
-	public boolean addCustomer(Customer c) {
+	public boolean addCustomerDao(Customer c) {
 		String addUserQuery = "INSERT INTO CUSTOMERS VALUES (?,?,?,?,?)";
 		try {
 			con = dbutil.getConnection();
@@ -28,18 +28,16 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setString(5, c.getCAddress());
 			int i = pst.executeUpdate();
 			if (i == 1) {
-				System.out.println("user Added Sucesfully with id : " + c.getCNumber());
+				System.out.println("User Added Sucesfully with id : " + c.getCNumber() + " , Name " + c.getCName());
 				String cNumber = c.getCNumber();
 				initUserBill(cNumber);
 				return true;
-			} else {
-				System.out.println("Duplicate User not added with Aadhar Number : " + c.getCId());
 			}
-
 		} catch (Exception e) {
 			e.getMessage();
 		}
 
+		System.out.println("Duplicate User not added with Aadhar Number : " + c.getCId());
 		return false;
 	}
 
@@ -148,7 +146,7 @@ public class EBillDaoImpl implements EBillDao {
 	}
 
 	@Override
-	public boolean addBill(Bill b) {
+	public boolean addBillDao(Bill b) {
 		String addBillQuery = "INSERT INTO BILL (CNUMBER,BILLNUMBER,UNITS,BILLAMOUNT) VALUES (?,?,?,?)";
 		try {
 			con = dbutil.getConnection();
@@ -161,6 +159,7 @@ public class EBillDaoImpl implements EBillDao {
 			int i = pst.executeUpdate();
 			if (i > 0) {
 				System.out.println("Bill added successfully ....for : " + b.getBNumber());
+				setDuedate(b.getCNumber(), b.getBNumber());
 				return true;
 			}
 		} catch (SQLException e) {
@@ -169,21 +168,39 @@ public class EBillDaoImpl implements EBillDao {
 		return false;
 	}
 
+	private void setDuedate(String cNumber, String bNumber) {
+		String setDueDateQuery = "update bill set billduedate = (SELECT DATE_ADD(CURRENT_TIMESTAMP , INTERVAL 30 DAY)) where cnumber=? and billnumber=?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareCall(setDueDateQuery);
+			pst.setString(1, cNumber);
+			pst.setString(2, bNumber);
+			int i = pst.executeUpdate();
+			if (i == 1) {
+				System.out.println("Due Date Set Succesfull");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	@Override
-	public boolean validateAdmin(String uName, String password) {
-		String checkQuery ="SELECT USERNAME FROM ADMIN WHERE USERNAME = ? and PASSWORD = ?";
+	public boolean validateAdminDao(String uName, String password) {
+		String checkQuery = "SELECT USERNAME FROM ADMIN WHERE USERNAME = ? and PASSWORD = ?";
 		try {
 			con = dbutil.getConnection();
 			pst = con.prepareStatement(checkQuery);
 			pst.setString(1, uName);
 			pst.setString(2, password);
-			rs=pst.executeQuery();
-			if(rs.next()) {
+			rs = pst.executeQuery();
+			if (rs.next()) {
 				System.out.println("Welcome Admin....");
 				return true;
 			}
-			
-		}catch (SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		System.out.println("Invalid login  ");

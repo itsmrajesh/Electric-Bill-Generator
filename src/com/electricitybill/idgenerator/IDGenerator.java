@@ -13,9 +13,9 @@ public class IDGenerator {
 
 	public String getID() {
 		int c = ebilldao.getCustomersCount();
-		int totalCount = count++;
+		int totalCount = count;
 		if (c == 0) {
-			return prefix + (totalCount + 1);
+			return prefix + (totalCount+1);
 		} else {
 			return prefix + (totalCount + c + 1);
 		}
@@ -24,9 +24,9 @@ public class IDGenerator {
 
 	public String getBillID() {
 		int c = ebilldao.getBillCount();
-		int totalCount = count++;
+		int totalCount = count;
 		if (c == 0) {
-			return billPrefix + (totalCount) + sufix;
+			return billPrefix + (totalCount+1) + sufix;
 		} else {
 			return billPrefix + (totalCount + c+1) + sufix;
 		}

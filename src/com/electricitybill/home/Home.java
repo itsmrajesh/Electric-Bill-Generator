@@ -11,14 +11,15 @@ import com.electricitybill.services.EBillServicesImpl;
 public class Home {
 	private static EBillDao ebilldao = new EBillDaoImpl();
 	private static IDGenerator ido = new IDGenerator();
-	private static EBillServices es = new EBillServicesImpl();
+	private static EBillServices es = EBillServicesImpl.getInstance();
 	private static Scanner sc = new Scanner(System.in);
 
 	public static void main(String[] args) {
 		String id = ido.getID();
 		Customer c = Customer.builder().cNumber(id).cName("MV MANJU").cId("748541415707").mobile("7892660266")
 				.cAddress("HYD").build();
-		// es.generateBill("BESCOM102");
+		// es.addCustomer();
+		// es.generateBill("BESCOM101");
 
 		System.out.println("Welcome Electricity Bill Generation Application");
 		System.out.println("1.Manager\n2.Customer");
@@ -30,12 +31,16 @@ public class Home {
 			String uName = sc.next();
 			System.out.println("Enter Password");
 			String password = sc.next();
-			if (ebilldao.validateAdmin(uName, password)) {
+			if (ebilldao.validateAdminDao(uName, password)) {
 				System.out.println("1.Add Customer\n2.View All Customers\n3.Search Customer\n 4.Search Bill");
+				int adminChoice = sc.nextInt();
+				
+
 			}
 			break;
 
 		}
+
 	}
 
 }

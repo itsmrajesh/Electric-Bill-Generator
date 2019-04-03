@@ -6,25 +6,25 @@ use ebill;
 
 drop table admin;
 
-create table admin(username varchar(50) primary key,password varchar(20) not null);
+create table admin(USERNAME varchar(50) primary key,PASSWORD varchar(20) not null);
 
 insert into admin values("rajesh","ebill");
 
-create table customers(cnumber varchar(50) primary key,cname varchar(70) not null,cid varchar(20) unique,mobile varchar(20) not null,address varchar(150) not null);
+create table customers(CNUMBER varchar(50) primary key,CNAME varchar(70) not null,CID varchar(20) unique,MOBILE varchar(20) not null,ADDRESS varchar(150) not null);
 
 drop table bill;
 
-create table bill(cnumber varchar(50),Billnumber varchar(50),units bigint(20) not null,date datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,billAmount double(10,2) not null,status varchar(7) not null,primary key(billnumber),FOREIGN KEY(cnumber) REFERENCES customers(cnumber));
-
+create table bill(CNUMBER varchar(50),BILLNUMBER varchar(50),UNITS bigint(20) not null,BILLDATE datetime DEFAULT CURRENT_TIMESTAMP ,BILLDUEDATE datetime,BILLPAIDDATE DATETIME DEFAULT 0 ON UPDATE CURRENT_TIMESTAMP,BILLAMOUNT double(10,2) not null,STATUS varchar(7) not null,primary key(billnumber),FOREIGN KEY(cnumber) REFERENCES customers(cnumber));
 
 alter table bill alter status SET DEFAULT 'NOTPAID';
 
-
-alter table bill alter date SET DEFAULT getdate();
-
-create table totalunits(cnumber varchar(50) not null,totalunits bigint(20) not null,FOREIGN KEY (cnumber) REFERENCES customers(cnumber));
+create table totalunits(CNUMBER varchar(50) not null,TOTALUNITS bigint(20) not null,FOREIGN KEY (cnumber) REFERENCES customers(cnumber));
 
 alter table totalunits alter totalunits SET DEFAULT 0;
 
-create table unitscost(unitcost bigint(20) not null,unitid varchar(10));
+create table unitscost(UNITCOST double(10,2) not null,UNITID varchar(10));
+insert into unitscost values(4.45,'constid')
 
+
+/*for setting due date in bill table 
+update bill set billduedate = (SELECT DATE_ADD(CURRENT_TIMESTAMP , INTERVAL 30 DAY)) where cnumber=? and billnumber=?; */

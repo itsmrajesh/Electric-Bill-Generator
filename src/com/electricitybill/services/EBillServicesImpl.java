@@ -12,7 +12,6 @@ import com.electricitybill.domain.Customer;
 import com.electricitybill.idgenerator.IDGenerator;
 
 public class EBillServicesImpl implements EBillServices {
-	private List<Customer> cList = new ArrayList<>();
 	private EBillDao ebilldao = new EBillDaoImpl();
 	private Scanner sc = new Scanner(System.in);
 	private IDGenerator idg = new IDGenerator();
@@ -20,6 +19,21 @@ public class EBillServicesImpl implements EBillServices {
 		loadCustomersData();
 		display();
 	}
+
+	private EBillServicesImpl() {
+
+	}
+
+	private static EBillServicesImpl obj;
+
+	public static synchronized EBillServicesImpl getInstance() {
+		if (obj == null) {
+			return new EBillServicesImpl();
+		}
+		return obj;
+	}
+
+	private List<Customer> cList = new ArrayList<>();
 
 	@Override
 	public List<Customer> searchCustomer(String str) {
@@ -73,7 +87,7 @@ public class EBillServicesImpl implements EBillServices {
 		billAmount = unitsConsumed * unitRate;
 		Bill bill = Bill.builder().cNumber(cNumber).bNumber(billID).units(unitsConsumed).billAmount(billAmount)
 				.date(date).build();
-		ebilldao.addBill(bill);
+		ebilldao.addBillDao(bill);
 
 	}
 
@@ -83,19 +97,24 @@ public class EBillServicesImpl implements EBillServices {
 	}
 
 	@Override
-	public boolean addCustomer(Customer c) {
+	public boolean addCustomer() {
 		String cNumber = idg.getID();
 		System.out.println("Enter Customer Name :");
 		String cName = sc.next();
 		System.out.println("Enter 12 Digit Aadhar Number ");
 		String cId = sc.next();
 		System.out.println("Enter Address or city");
-		String cAddress = sc.nextLine();
+		String cAddress = sc.next();
 		System.out.println("Enter Customer Number");
 		String mobile = sc.next();
 		Customer customer = Customer.builder().cNumber(cNumber).cName(cName).cId(cId).mobile(mobile).cAddress(cAddress)
 				.build();
-		return ebilldao.addCustomer(customer);
+		return ebilldao.addCustomerDao(customer);
+	}
+
+	@Override
+	public void searchBill(String cNumber, String billNumber) {
+
 	}
 
 }
