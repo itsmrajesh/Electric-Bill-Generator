@@ -13,8 +13,8 @@ import com.electricitybill.idgenerator.IDGenerator;
 
 public class EBillServicesImpl implements EBillServices {
 	private List<Customer> cList = new ArrayList<>();
-	private Scanner sc = new Scanner(System.in);
 	private EBillDao ebilldao = new EBillDaoImpl();
+	private Scanner sc = new Scanner(System.in);
 	private IDGenerator idg = new IDGenerator();
 	{
 		loadCustomersData();
@@ -80,6 +80,22 @@ public class EBillServicesImpl implements EBillServices {
 	public void loadCustomersData() {
 		System.out.println("Loading all Customers data..");
 		cList = ebilldao.getAllCustomers();
+	}
+
+	@Override
+	public boolean addCustomer(Customer c) {
+		String cNumber = idg.getID();
+		System.out.println("Enter Customer Name :");
+		String cName = sc.next();
+		System.out.println("Enter 12 Digit Aadhar Number ");
+		String cId = sc.next();
+		System.out.println("Enter Address or city");
+		String cAddress = sc.nextLine();
+		System.out.println("Enter Customer Number");
+		String mobile = sc.next();
+		Customer customer = Customer.builder().cNumber(cNumber).cName(cName).cId(cId).mobile(mobile).cAddress(cAddress)
+				.build();
+		return ebilldao.addCustomer(customer);
 	}
 
 }

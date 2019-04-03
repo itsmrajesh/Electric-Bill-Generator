@@ -16,7 +16,7 @@ public class EBillDaoImpl implements EBillDao {
 	private ResultSet rs;
 
 	@Override
-	public boolean addUser(Customer c) {
+	public boolean addCustomer(Customer c) {
 		String addUserQuery = "INSERT INTO CUSTOMERS VALUES (?,?,?,?,?)";
 		try {
 			con = dbutil.getConnection();
@@ -166,6 +166,27 @@ public class EBillDaoImpl implements EBillDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return false;
+	}
+
+	@Override
+	public boolean validateAdmin(String uName, String password) {
+		String checkQuery ="SELECT USERNAME FROM ADMIN WHERE USERNAME = ? and PASSWORD = ?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(checkQuery);
+			pst.setString(1, uName);
+			pst.setString(2, password);
+			rs=pst.executeQuery();
+			if(rs.next()) {
+				System.out.println("Welcome Admin....");
+				return true;
+			}
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Invalid login  ");
 		return false;
 	}
 
