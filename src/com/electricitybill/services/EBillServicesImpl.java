@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import com.electricitybill.dao.EBillDao;
 import com.electricitybill.dao.EBillDaoImpl;
+import com.electricitybill.dbutil.DBUtil;
 import com.electricitybill.domain.Bill;
 import com.electricitybill.domain.Customer;
 import com.electricitybill.idgenerator.IDGenerator;
@@ -15,10 +16,6 @@ public class EBillServicesImpl implements EBillServices {
 	private EBillDao ebilldao = new EBillDaoImpl();
 	private Scanner sc = new Scanner(System.in);
 	private IDGenerator idg = new IDGenerator();
-	{
-		loadCustomersData();
-		display();
-	}
 
 	private EBillServicesImpl() {
 
@@ -35,21 +32,52 @@ public class EBillServicesImpl implements EBillServices {
 
 	private List<Customer> cList = new ArrayList<>();
 
+	{
+		loadCustomersData();
+	}
+
+	public void loadCustomersData() {
+		System.out.println("Loading Customers Data....");
+		cList = ebilldao.getAllCustomers();
+	}
+
 	@Override
-	public List<Customer> searchCustomer(String str) {
+	public List<Customer> searchCustomer(String searchStr) {
+		String str = searchStr.toLowerCase();
 		List<Customer> searchList = new ArrayList<>();
 		for (Customer c : cList) {
-			if (c.getCNumber().equals(str) || c.getCId().equals(str) || c.getCName().equals(str)) {
+			if (c.getCNumber().equalsIgnoreCase(str) || c.getCId().equals(str)
+					|| c.getCName().toLowerCase().equals(str)) {
 				searchList.add(c);
 			}
 		}
+		paintData(searchList);
 		return searchList;
 	}
 
-	public void display() {
-		for (Customer l : cList) {
-			System.out.println("Name " + l.getCName());
+	private void paintData(List<Customer> searchList) {
+		if (searchList.isEmpty()) {
+			System.out.println("No Customer found");
+		} else {
+			for (Customer cc : searchList) {
+				System.out.println("Name :" + cc.getCName());
+				System.out.println("Cnumber is " + cc.getCNumber());
+				System.out.println("Place is " + cc.getCAddress());
+			}
 		}
+	}
+
+	@Override
+	public void display() {
+		loadCustomersData();
+		System.out.println("----------------------------");
+		System.out.println("Display All Customers Details....");
+		for (Customer c : cList) {
+			System.out.println("Name " + c.getCName());
+			System.out.println("CNumber :" + c.getCNumber());
+			System.out.println("------------------------");
+		}
+
 	}
 
 	@Override
@@ -85,27 +113,21 @@ public class EBillServicesImpl implements EBillServices {
 			unitsConsumed = currentUnits - totalUnits;
 		}
 		billAmount = unitsConsumed * unitRate;
-		Bill bill = Bill.builder().cNumber(cNumber).bNumber(billID).units(unitsConsumed).billAmount(billAmount)
-				.date(date).build();
+		Bill bill = Bill.builder().cNumber(cNumber).bNumber(billID).units(unitsConsumed).billAmount(billAmount).build();
 		ebilldao.addBillDao(bill);
 
-	}
-
-	public void loadCustomersData() {
-		System.out.println("Loading all Customers data..");
-		cList = ebilldao.getAllCustomers();
 	}
 
 	@Override
 	public boolean addCustomer() {
 		String cNumber = idg.getID();
 		System.out.println("Enter Customer Name :");
-		String cName = sc.next();
+		String cName = sc.nextLine();
 		System.out.println("Enter 12 Digit Aadhar Number ");
 		String cId = sc.next();
 		System.out.println("Enter Address or city");
 		String cAddress = sc.next();
-		System.out.println("Enter Customer Number");
+		System.out.println("Enter Customer Phone Number");
 		String mobile = sc.next();
 		Customer customer = Customer.builder().cNumber(cNumber).cName(cName).cId(cId).mobile(mobile).cAddress(cAddress)
 				.build();
@@ -113,8 +135,35 @@ public class EBillServicesImpl implements EBillServices {
 	}
 
 	@Override
-	public void searchBill(String cNumber, String billNumber) {
+	public void searchBill(String billNumber) {
+		if (!billNumber.equals(" ")) {
+			ebilldao.getBillDao(billNumber);
+		} else {
+			System.out.println("Invalid Bill" + " Number");
+		}
 
+	}
+
+	public boolean isCustomerPresent(String cNumber) {
+		loadCustomersData();
+		for (Customer c : cList) {
+			if (c.getCNumber().equalsIgnoreCase(cNumber)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean payBill(String cNumber, String billNumber) {
+		if (!(cNumber.equals(" ") && billNumber.equals(" "))) {
+			if (ebilldao.getBillDao(billNumber) && !(ebilldao.isPaid(billNumber))) {
+				ebilldao.payBillDao(cNumber, billNumber);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

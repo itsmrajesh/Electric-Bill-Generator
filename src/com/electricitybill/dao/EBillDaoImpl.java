@@ -83,7 +83,7 @@ public class EBillDaoImpl implements EBillDao {
 			st = con.createStatement();
 			rs = st.executeQuery(viewQuery);
 			while (rs.next()) {
-				list.add(Customer.builder().cId(rs.getString(1)).cName(rs.getString(2)).cId(rs.getString(3))
+				list.add(Customer.builder().cNumber(rs.getString(1)).cName(rs.getString(2)).cId(rs.getString(3))
 						.mobile(rs.getString(4)).cAddress(rs.getString(5)).build());
 			}
 		} catch (SQLException e) {
@@ -121,8 +121,8 @@ public class EBillDaoImpl implements EBillDao {
 			while (rs.next()) {
 				units = rs.getInt("totalunits");
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return units;
 	}
@@ -139,8 +139,8 @@ public class EBillDaoImpl implements EBillDao {
 			if (i > 0) {
 				System.out.println("Total units updated....");
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -154,12 +154,13 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setString(1, b.getCNumber());
 			pst.setString(2, b.getBNumber());
 			pst.setInt(3, b.getUnits());
-			// pst.setDate(4, (Date)b.getDate());
 			pst.setDouble(4, b.getBillAmount());
 			int i = pst.executeUpdate();
 			if (i > 0) {
-				System.out.println("Bill added successfully ....for : " + b.getBNumber());
+				System.out.println("Bill added successfully ....with bill number : " + b.getBNumber()
+						+ " for Customer : " + b.getCNumber());
 				setDuedate(b.getCNumber(), b.getBNumber());
+				getBillDao(b.getBNumber());
 				return true;
 			}
 		} catch (SQLException e) {
@@ -169,7 +170,7 @@ public class EBillDaoImpl implements EBillDao {
 	}
 
 	private void setDuedate(String cNumber, String bNumber) {
-		String setDueDateQuery = "update bill set billduedate = (SELECT DATE_ADD(CURRENT_TIMESTAMP , INTERVAL 30 DAY)) where cnumber=? and billnumber=?";
+		String setDueDateQuery = "UPDATE bill SET billduedate = (SELECT DATE_ADD(CURRENT_TIMESTAMP , INTERVAL 30 DAY)) WHERE cnumber=? AND billnumber=?";
 		try {
 			con = dbutil.getConnection();
 			pst = con.prepareCall(setDueDateQuery);
@@ -205,6 +206,103 @@ public class EBillDaoImpl implements EBillDao {
 		}
 		System.out.println("Invalid login  ");
 		return false;
+	}
+
+	@Override
+	public boolean getBillDao(String billNumber) {
+		String getBillQuery = "SELECT * FROM BILL WHERE BILLNUMBER = ?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(getBillQuery);
+			pst.setString(1, billNumber);
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				paintBillDetails();
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("No Bill Found with given Bill Number : " + billNumber);
+		return false;
+
+	}
+
+	private void paintBillDetails() throws SQLException {
+		String cNumber = rs.getString("cNumber").toUpperCase();
+		String bNumber = rs.getString("billNumber");
+		int units = rs.getInt("units");
+		String billDate = rs.getString("billDate").substring(0, 10);
+		String dueDate = rs.getString("billdueDate").substring(0, 10);
+		String billPaidDate = rs.getString("billpaiddate");
+		double billAmount = rs.getInt("billamount");
+		String status = rs.getString("status");
+		System.out.println("Bill Details for Customer " + cNumber);
+		System.out.println("---------------------------------------");
+		System.out.println("Customer Number    : " + cNumber + "\nBillNumber   : " + bNumber + "\nNo of Units : "
+				+ units + "\nBill date  : " + billDate + "\nDue date   : " + dueDate + "\nBillAmount : " + billAmount
+				+ "\nStatus    : " + status);
+		System.out.println("----------------------------------------");
+	}
+
+	@Override
+	public boolean payBillDao(String cNumber, String billNumber) {
+		String payBillQuery = "UPDATE BILL SET STATUS = ? WHERE CNUMBER = ? AND BILLNUMBER = ?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(payBillQuery);
+			pst.setString(1, "PAID");
+			pst.setString(2, cNumber);
+			pst.setString(3, billNumber);
+			int i = pst.executeUpdate();
+			if (i == 1) {
+				System.out.println("Bill Payed Successfull for Bill Number : " + billNumber);
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isPaid(String billNumber) {
+		String isPaidQuery = "SELECT STATUS FROM BILL WHERE STATUS = ? AND BILLNUMBER =? ";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(isPaidQuery);
+			pst.setString(1, "PAID");
+			pst.setString(2, billNumber);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				System.out.println("Bill Payed for Bill Number : " + billNumber.toUpperCase());
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Bill Not Paid Bill Number : " + billNumber.toUpperCase());
+		return false;
+	}
+
+	@Override
+	public double getTotalBillDao(String cNumber) {
+		String totalBillQuery = "SELECT SUM(BILLAMOUNT) FROM BILL WHERE STATUS=? AND CNUMBER=?";
+		double totalDueBill = 0;
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(totalBillQuery);
+			pst.setString(1, "NOTPAID");
+			pst.setString(2, cNumber);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				totalDueBill = rs.getDouble(1);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return totalDueBill;
 	}
 
 }

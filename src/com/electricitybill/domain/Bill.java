@@ -15,7 +15,9 @@ public class Bill {
 	private String cNumber;
 	private String bNumber;
 	private int units;
-	private LocalDate date;
+	private String billDate;
+	private String dueDate;
+	private String billPaidDate;
 	private double billAmount;
-	private String status;	
+	private String status;
 }

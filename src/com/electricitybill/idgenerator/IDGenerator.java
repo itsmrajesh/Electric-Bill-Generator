@@ -7,15 +7,16 @@ public class IDGenerator {
 	private EBillDao ebilldao = new EBillDaoImpl();
 	private static String prefix = "BESCOM";
 	private static int count = 100;
+//	private static int billCount=74;
 
-	private static String billPrefix = "BLRBES";
-	private static String sufix = "KA";
+	private static String billPrefix = "KABES";
+	// private static String sufix = "KA";
 
 	public String getID() {
 		int c = ebilldao.getCustomersCount();
 		int totalCount = count;
 		if (c == 0) {
-			return prefix + (totalCount+1);
+			return prefix + (totalCount + 1);
 		} else {
 			return prefix + (totalCount + c + 1);
 		}
@@ -26,9 +27,9 @@ public class IDGenerator {
 		int c = ebilldao.getBillCount();
 		int totalCount = count;
 		if (c == 0) {
-			return billPrefix + (totalCount+1) + sufix;
+			return billPrefix + (totalCount + 1);
 		} else {
-			return billPrefix + (totalCount + c+1) + sufix;
+			return billPrefix + (totalCount + c + 1);
 		}
 	}
 }

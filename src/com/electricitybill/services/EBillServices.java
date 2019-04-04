@@ -6,7 +6,14 @@ import com.electricitybill.domain.Customer;
 
 public interface EBillServices {
 	boolean addCustomer();
+
+	void display();
+
 	List<Customer> searchCustomer(String str);
+
 	void generateBill(String cNumber);
-	void searchBill(String cNumber,String billNumber);
+
+	void searchBill(String billNumber);
+	
+	boolean payBill(String cNumber,String billNumber);
 }
