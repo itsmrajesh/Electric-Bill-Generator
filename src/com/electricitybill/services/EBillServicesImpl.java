@@ -43,6 +43,7 @@ public class EBillServicesImpl implements EBillServices {
 
 	@Override
 	public List<Customer> searchCustomer(String searchStr) {
+		loadCustomersData();
 		String str = searchStr.toLowerCase();
 		List<Customer> searchList = new ArrayList<>();
 		for (Customer c : cList) {
@@ -137,7 +138,7 @@ public class EBillServicesImpl implements EBillServices {
 	@Override
 	public void searchBill(String billNumber) {
 		if (!billNumber.equals(" ")) {
-			ebilldao.getBillDao(billNumber);
+			ebilldao.getBillByBillNumberDao(billNumber);
 		} else {
 			System.out.println("Invalid Bill" + " Number");
 		}
@@ -155,15 +156,29 @@ public class EBillServicesImpl implements EBillServices {
 	}
 
 	@Override
-	public boolean payBill(String cNumber, String billNumber) {
-		if (!(cNumber.equals(" ") && billNumber.equals(" "))) {
-			if (ebilldao.getBillDao(billNumber) && !(ebilldao.isPaid(billNumber))) {
-				ebilldao.payBillDao(cNumber, billNumber);
-				return true;
+	public boolean payTotalBill(String cNumber) {
+		double totalDueBill = ebilldao.getTotalBillDao(cNumber);
+		System.out.println("Your total bill due is : " + totalDueBill);
+		if (totalDueBill > 0.50) {
+			System.out.println("Press 1 to Pay Bill  and Press 0 Exit :");
+			int choice = sc.nextInt();
+			if (choice == 1) {
+				ebilldao.payTotalBill(cNumber);
+			} else {
+				return false;
 			}
 		}
 
 		return false;
 	}
 
+	public boolean payBillByBillNumber(String cNumber, String billNumber) {
+		if (!(cNumber.equals(" ") && billNumber.equals(" "))) {
+			if (ebilldao.getBillByBillNumberDao(billNumber) && !(ebilldao.isBillPaid(billNumber))) {
+				ebilldao.payBillByBillNumberDao(cNumber, billNumber);
+				return true;
+			}
+		}
+		return false;
+	}
 }

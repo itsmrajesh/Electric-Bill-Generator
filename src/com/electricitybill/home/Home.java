@@ -9,13 +9,15 @@ import com.electricitybill.services.EBillServices;
 import com.electricitybill.services.EBillServicesImpl;
 
 public class Home {
-	private static EBillDao ebilldao = new EBillDaoImpl();
-	private static EBillServicesImpl es = EBillServicesImpl.getInstance();
+	private static EBillDao ebilldao;
+	private static EBillServicesImpl es;
 	private static Scanner sc = new Scanner(System.in);
 
 	public static void main(String[] args) {
+		es = EBillServicesImpl.getInstance();
+		ebilldao = new EBillDaoImpl();
 		System.out.println("Welcome Electricity Bill Generation Application");
-		System.out.println("1.Manager \t 2.Customer");
+		System.out.println("1.Manager \t 2.Customer \t 3.Exit");
 		int choice = sc.nextInt();
 		switch (choice) {
 		case 1:
@@ -32,7 +34,7 @@ public class Home {
 			String cNumber;
 			while (true) {
 				System.out.println("Enter Customer Number ");
-				cNumber = sc.next();
+				cNumber = sc.next().toUpperCase();
 				if (es.isCustomerPresent(cNumber)) {
 					userOperations(cNumber);
 					break;
@@ -41,31 +43,53 @@ public class Home {
 				}
 			}
 			break;
+		case 3:
+			System.out.println("Terminiting the Application.....");
+			System.exit(0);
 		}
 
 	}
 
 	private static void userOperations(String cNumber) {
-		System.out.println("User Operations.......");
-		System.out.println("1.Pay Bill\n2.Show Total Due Bill\n3.Show All Bill Details\n4.Search Bill");
-		System.out.println("Enter Your Choice (1-4) : ");
-		int userChoice = sc.nextInt();
-		switch (userChoice) {
-		case 1:
-			System.out.println("Enter Bill Number : ");
-			String billNumber = sc.next();
-			es.payBill(cNumber, billNumber);
-			break;
-		case 2:
-			System.out.println("Total Due Bill..");
-			System.out.println("Total bill is :- " + ebilldao.getTotalBillDao(cNumber));
-			break;
-		case 4:
-			System.out.println("Search Bill....");
-			System.out.println("Enter Bill Number :");
-			billNumber = sc.next();
-			es.searchBill(billNumber);
-			break;
+		while (true) {
+			System.out.println("User Operations.......");
+			System.out.println(
+					"1.Pay Bill\n2.Show Total Due Bill\n3.Show All Bill Details\n4.Search Bill\n5.Pay Monthly Bill\n6.Exit");
+			System.out.println("Enter Your Choice (1-6) : ");
+			int userChoice = sc.nextInt();
+			String billNumber;
+			switch (userChoice) {
+			case 1:
+				/*
+				 * System.out.println("Enter Bill Number : "); String billNumber = sc.next();
+				 * es.payBill(cNumber, billNumber);
+				 */
+				es.payTotalBill(cNumber);
+				break;
+			case 2:
+				System.out.println("Total Due Bill..");
+				System.out.println("Total Pending bill is in Rupess :- " + ebilldao.getTotalBillDao(cNumber));
+				break;
+			case 3:
+				System.out.println("All Bill Details......");
+				ebilldao.showBillDetails(cNumber);
+				break;
+			case 4:
+				System.out.println("Search Bill....");
+				System.out.println("Enter Bill Number :");
+				billNumber = sc.next().toUpperCase();
+				es.searchBill(billNumber);
+				break;
+			case 5:
+				System.out.println("Enter Bill Number : ");
+				billNumber = sc.next();
+				es.payBillByBillNumber(cNumber, billNumber);
+				break;
+			case 6:
+				System.out.println("Exiting customer Mode......");
+				Home.main(null);
+				break;
+			}
 		}
 
 	}
@@ -74,7 +98,7 @@ public class Home {
 		while (true) {
 			System.out.println("------------------------");
 			System.out.println(
-					"1.Add Customer\n2.View All Customers\n3.Search Customer\n4.Bill Generation\n5.Search Bill");
+					"1.Add Customer\n2.View All Customers\n3.Search Customer\n4.Bill Generation\n5.Search Bill\n6.EXIT");
 			System.out.println("Enter your Choice ");
 			int adminChoice = sc.nextInt();
 			switch (adminChoice) {
@@ -95,7 +119,7 @@ public class Home {
 				while (true) {
 					System.out.println("Generate Bill ");
 					System.out.println("Enter Customer Number ");
-					cNumber = sc.next();
+					cNumber = sc.next().toUpperCase();
 					if (es.isCustomerPresent(cNumber)) {
 						es.generateBill(cNumber);
 						break;
@@ -108,8 +132,12 @@ public class Home {
 			case 5:
 				System.out.println("Search Bill....");
 				System.out.println("Enter Bill Number :");
-				String billNumber = sc.next();
+				String billNumber = sc.next().toUpperCase();
 				es.searchBill(billNumber);
+				break;
+			case 6:
+				System.out.println("Exiting Manager Mode......");
+				Home.main(null);
 				break;
 			}
 		}

@@ -3,6 +3,8 @@ package com.electricitybill.dao;
 import com.electricitybill.dbutil.DBUtil;
 import com.electricitybill.domain.Bill;
 import com.electricitybill.domain.Customer;
+import com.electricitybill.services.EBillServicesImpl;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +162,7 @@ public class EBillDaoImpl implements EBillDao {
 				System.out.println("Bill added successfully ....with bill number : " + b.getBNumber()
 						+ " for Customer : " + b.getCNumber());
 				setDuedate(b.getCNumber(), b.getBNumber());
-				getBillDao(b.getBNumber());
+				getBillByBillNumberDao(b.getBNumber());
 				return true;
 			}
 		} catch (SQLException e) {
@@ -209,7 +211,7 @@ public class EBillDaoImpl implements EBillDao {
 	}
 
 	@Override
-	public boolean getBillDao(String billNumber) {
+	public boolean getBillByBillNumberDao(String billNumber) {
 		String getBillQuery = "SELECT * FROM BILL WHERE BILLNUMBER = ?";
 		try {
 			con = dbutil.getConnection();
@@ -246,7 +248,7 @@ public class EBillDaoImpl implements EBillDao {
 	}
 
 	@Override
-	public boolean payBillDao(String cNumber, String billNumber) {
+	public boolean payBillByBillNumberDao(String cNumber, String billNumber) {
 		String payBillQuery = "UPDATE BILL SET STATUS = ? WHERE CNUMBER = ? AND BILLNUMBER = ?";
 		try {
 			con = dbutil.getConnection();
@@ -266,7 +268,7 @@ public class EBillDaoImpl implements EBillDao {
 	}
 
 	@Override
-	public boolean isPaid(String billNumber) {
+	public boolean isBillPaid(String billNumber) {
 		String isPaidQuery = "SELECT STATUS FROM BILL WHERE STATUS = ? AND BILLNUMBER =? ";
 		try {
 			con = dbutil.getConnection();
@@ -303,6 +305,44 @@ public class EBillDaoImpl implements EBillDao {
 			e.printStackTrace();
 		}
 		return totalDueBill;
+	}
+
+	@Override
+	public boolean payTotalBill(String cNumber) {
+		String updateBillPaidQuery = "UPDATE BILL SET STATUS =? WHERE CNUMBER =? AND STATUS=?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(updateBillPaidQuery);
+			pst.setString(1, "PAID");
+			pst.setString(2, cNumber);
+			pst.setString(3, "NOTPAID");
+			int i = pst.executeUpdate();
+			if (i > 0) {
+				System.out.println("Bill Paid Sucessfully for Customer with C-Number " + cNumber);
+				return true;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Error Occured while paying bill for Cnumber : " + cNumber);
+		return false;
+	}
+
+	@Override
+	public void showBillDetails(String cNumber) {
+		String showBillQuery = "SELECT * FROM BILL WHERE CNUMBER =?";
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(showBillQuery);
+			pst.setString(1, cNumber);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				paintBillDetails();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

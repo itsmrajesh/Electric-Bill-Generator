@@ -15,5 +15,7 @@ public interface EBillServices {
 
 	void searchBill(String billNumber);
 	
-	boolean payBill(String cNumber,String billNumber);
+	boolean payTotalBill(String cNumber);
+	
+	
 }

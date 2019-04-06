@@ -6,27 +6,31 @@ import com.electricitybill.domain.Bill;
 import com.electricitybill.domain.Customer;
 
 public interface EBillDao {
-	boolean validateAdminDao(String uName, String password);
-
-	int getCustomersCount();
-
-	int getBillCount();
-
 	boolean addCustomerDao(Customer c);
 
 	List<Customer> getAllCustomers();
 
-	int getTotalUnits(String cNumber);
+	int getCustomersCount();
+
+	boolean validateAdminDao(String uName, String password);
+
+	boolean addBillDao(Bill bill);
+
+	int getBillCount();
+
+	boolean getBillByBillNumberDao(String billNumber);
+
+	boolean payBillByBillNumberDao(String cNumber, String billNumber);
+
+	boolean isBillPaid(String billNumber);
 
 	boolean updateUnitsConsumed(String cNumber, int units);
 
-	boolean addBillDao(Bill b);
-
-	boolean isPaid(String billNumber);
-
-	boolean payBillDao(String cNumber, String billNumber);
-
-	boolean getBillDao(String billNumber);
+	int getTotalUnits(String cNumber);
 
 	double getTotalBillDao(String cNumber);
+
+	boolean payTotalBill(String cNumber);
+
+	void showBillDetails(String cNumber);
 }
