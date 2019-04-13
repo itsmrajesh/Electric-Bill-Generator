@@ -13,6 +13,7 @@ import com.electricitybill.domain.Customer;
 import com.electricitybill.idgenerator.IDGenerator;
 
 public class EBillServicesImpl implements EBillServices {
+
 	private EBillDao ebilldao = new EBillDaoImpl();
 	private Scanner sc = new Scanner(System.in);
 	private IDGenerator idg = new IDGenerator();
@@ -37,7 +38,7 @@ public class EBillServicesImpl implements EBillServices {
 	}
 
 	public void loadCustomersData() {
-		System.out.println("Loading Customers Data....");
+		// System.out.println("Loading Customers Data....");
 		cList = ebilldao.getAllCustomers();
 	}
 
@@ -60,12 +61,20 @@ public class EBillServicesImpl implements EBillServices {
 		if (searchList.isEmpty()) {
 			System.out.println("No Customer found");
 		} else {
-			for (Customer cc : searchList) {
-				System.out.println("Name :" + cc.getCName());
-				System.out.println("Cnumber is " + cc.getCNumber());
-				System.out.println("Place is " + cc.getCAddress());
+			for (Customer customer : searchList) {
+				paintCustomersData(customer);
 			}
 		}
+	}
+
+	private void paintCustomersData(Customer customer) {
+		System.out.println("------------------------------");
+		System.out.println("Name :-" + customer.getCName());
+		System.out.println("Cnumber is :-" + customer.getCNumber());
+		System.out.println("ID Number is :-" + customer.getCId());
+		System.out.println("Mobile Number is :-" + customer.getMobile());
+		System.out.println("Place is :- " + customer.getCAddress());
+		System.out.println("-------------------------------");
 	}
 
 	@Override
@@ -74,9 +83,7 @@ public class EBillServicesImpl implements EBillServices {
 		System.out.println("----------------------------");
 		System.out.println("Display All Customers Details....");
 		for (Customer c : cList) {
-			System.out.println("Name " + c.getCName());
-			System.out.println("CNumber :" + c.getCNumber());
-			System.out.println("------------------------");
+			paintCustomersData(c);
 		}
 
 	}
@@ -86,17 +93,16 @@ public class EBillServicesImpl implements EBillServices {
 		System.out.println("Bill Generation....");
 		String billID = idg.getBillID();
 		LocalDate date = LocalDate.now();
-		System.out.println("date is " + date);
-		double unitRate = 0;
+		System.out.println("Today date is " + date);
+		double unitRate = ebilldao.getUnitPrice();
 		double billAmount;
 		int unitsConsumed;
 		int totalUnits = ebilldao.getTotalUnits(cNumber);
-		if (totalUnits < 500) {
-			unitRate = 4.45;
-		} else {
-			unitRate = 5.45;
+		if (totalUnits > 500) {
+			unitRate += 1;
 		}
-		System.out.println("Previous units " + totalUnits);
+		System.out.println("One Unit Price is :-" + unitRate);
+		System.out.println("Previous units :- " + totalUnits);
 		int currentUnits = 0;
 		while (true) {
 			System.out.println("Enter units Consumed..");
@@ -104,7 +110,6 @@ public class EBillServicesImpl implements EBillServices {
 			if (currentUnits < totalUnits) {
 				System.out.println("Invalid units entry");
 			} else {
-				ebilldao.updateUnitsConsumed(cNumber, currentUnits);
 				break;
 			}
 		}
@@ -115,21 +120,39 @@ public class EBillServicesImpl implements EBillServices {
 		}
 		billAmount = unitsConsumed * unitRate;
 		Bill bill = Bill.builder().cNumber(cNumber).bNumber(billID).units(unitsConsumed).billAmount(billAmount).build();
-		ebilldao.addBillDao(bill);
+		if (ebilldao.addBillDao(bill)) {
+			ebilldao.updateUnitsConsumed(cNumber, currentUnits);
+		}
 
 	}
 
 	@Override
 	public boolean addCustomer() {
 		String cNumber = idg.getID();
-		System.out.println("Enter Customer Name :");
+		System.out.println("Enter Customer Name :-");
 		String cName = sc.nextLine();
-		System.out.println("Enter 12 Digit Aadhar Number ");
-		String cId = sc.next();
-		System.out.println("Enter Address or city");
+		String cId;
+		while (true) {
+			System.out.println("Enter 12 Digit Aadhaar Number :- ");
+			cId = sc.next();
+			if (cId.length() != 12) {
+				System.out.println("******Invalid  Aadhaar Number");
+			} else if (cId.length() == 12) {
+				break;
+			}
+		}
+		System.out.println("Enter Address or city :-");
 		String cAddress = sc.next();
-		System.out.println("Enter Customer Phone Number");
-		String mobile = sc.next();
+		String mobile;
+		while (true) {
+			System.out.println("Enter Customer Phone Number :-");
+			mobile = sc.next();
+			if (mobile.length() != 10) {
+				System.out.println("*****Invalid 10 Digit mobile number");
+			} else if (mobile.length() == 10) {
+				break;
+			}
+		}
 		Customer customer = Customer.builder().cNumber(cNumber).cName(cName).cId(cId).mobile(mobile).cAddress(cAddress)
 				.build();
 		return ebilldao.addCustomerDao(customer);
@@ -149,6 +172,9 @@ public class EBillServicesImpl implements EBillServices {
 		loadCustomersData();
 		for (Customer c : cList) {
 			if (c.getCNumber().equalsIgnoreCase(cNumber)) {
+				System.out.println("NAME :-" + c.getCName());
+				System.out.println("Customer Number :-" + c.getCNumber());
+				System.out.println("Mobile :-" + c.getMobile());
 				return true;
 			}
 		}
@@ -165,10 +191,10 @@ public class EBillServicesImpl implements EBillServices {
 			if (choice == 1) {
 				ebilldao.payTotalBill(cNumber);
 			} else {
+				System.out.println("Exiting Bill Paying Section....");
 				return false;
 			}
 		}
-
 		return false;
 	}
 

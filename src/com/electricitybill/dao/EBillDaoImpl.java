@@ -30,7 +30,7 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setString(5, c.getCAddress());
 			int i = pst.executeUpdate();
 			if (i == 1) {
-				System.out.println("User Added Sucesfully with id : " + c.getCNumber() + " , Name " + c.getCName());
+				System.out.println("User Added Sucesfully with id : " + c.getCNumber() + " , Name : " + c.getCName());
 				String cNumber = c.getCNumber();
 				initUserBill(cNumber);
 				return true;
@@ -158,7 +158,7 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setInt(3, b.getUnits());
 			pst.setDouble(4, b.getBillAmount());
 			int i = pst.executeUpdate();
-			if (i > 0) {
+			if (i == 1) {
 				System.out.println("Bill added successfully ....with bill number : " + b.getBNumber()
 						+ " for Customer : " + b.getCNumber());
 				setDuedate(b.getCNumber(), b.getBNumber());
@@ -199,7 +199,7 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setString(2, password);
 			rs = pst.executeQuery();
 			if (rs.next()) {
-				System.out.println("Welcome Admin....");
+				System.out.println("Welcome Admin....:-" + rs.getString("username"));
 				return true;
 			}
 
@@ -244,6 +244,9 @@ public class EBillDaoImpl implements EBillDao {
 		System.out.println("Customer Number    : " + cNumber + "\nBillNumber   : " + bNumber + "\nNo of Units : "
 				+ units + "\nBill date  : " + billDate + "\nDue date   : " + dueDate + "\nBillAmount : " + billAmount
 				+ "\nStatus    : " + status);
+		if (status.equals("PAID")) {
+			System.out.println("Bill Paid Date :-" + billPaidDate.substring(0, 10));
+		}
 		System.out.println("----------------------------------------");
 	}
 
@@ -277,13 +280,13 @@ public class EBillDaoImpl implements EBillDao {
 			pst.setString(2, billNumber);
 			rs = pst.executeQuery();
 			while (rs.next()) {
-				System.out.println("Bill Payed for Bill Number : " + billNumber.toUpperCase());
+				System.out.println("Bill Already Paid for Bill Number : " + billNumber.toUpperCase());
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Bill Not Paid Bill Number : " + billNumber.toUpperCase());
+		System.out.println("Bill Not Paid Bill Number : " + billNumber.toUpperCase()+ " You may continue to Pay");
 		return false;
 	}
 
@@ -339,6 +342,39 @@ public class EBillDaoImpl implements EBillDao {
 			rs = pst.executeQuery();
 			while (rs.next()) {
 				paintBillDetails();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public double getUnitPrice() {
+		String unitPriceQuery = "SELECT UNITCOST FROM UNITSCOST";
+		try {
+			con = dbutil.getConnection();
+			st = con.createStatement();
+			rs = st.executeQuery(unitPriceQuery);
+			if (rs.next()) {
+				return rs.getDouble(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 4.45; // Base unit cost price
+	}
+
+	@Override
+	public void updateUnitPrice(double unitprice) {
+		String updateQuery = "UPDATE UNITSCOST SET UNITCOST = ?";
+		double oldUnitRate = getUnitPrice();
+		try {
+			con = dbutil.getConnection();
+			pst = con.prepareStatement(updateQuery);
+			pst.setDouble(1, unitprice);
+			int i = pst.executeUpdate();
+			if (i == 1) {
+				System.out.println("UnitRate Update Succesfull... from " + oldUnitRate + " to " + unitprice);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

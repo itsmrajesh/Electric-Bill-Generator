@@ -5,6 +5,7 @@ import java.util.List;
 import com.electricitybill.domain.Customer;
 
 public interface EBillServices {
+	
 	boolean addCustomer();
 
 	void display();

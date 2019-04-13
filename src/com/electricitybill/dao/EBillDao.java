@@ -33,4 +33,8 @@ public interface EBillDao {
 	boolean payTotalBill(String cNumber);
 
 	void showBillDetails(String cNumber);
+
+	double getUnitPrice();
+	
+	void updateUnitPrice(double unitprice);
 }
