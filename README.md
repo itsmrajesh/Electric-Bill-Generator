@@ -1,5 +1,7 @@
 # Electric-Bill-Generator
 
+### For updated docs [click here](https://github.com/itsmrajesh/Electric-Bill-Generator)
+
 ## This Project uses Lombok library [setup](https://www.baeldung.com/lombok-ide)
 
 Make sure that your eclipse is installed with lombok.
