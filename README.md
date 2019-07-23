@@ -9,7 +9,9 @@ Without lombok this project will not working use above link to download lombok a
 open DButil.java file then change username and password. 
 if you have done every above steps correctly then your ready to use this project
 
-### For more info[click here](https://www.youtube.com/watch?v=y_YxwyYRJek)
+### For more info [click here](https://www.youtube.com/watch?v=y_YxwyYRJek)
 
 # Credits:
-	M RAJESH (Team Lead and Developer) [GitHub](https://github.com/itsmrajesh)
+	M RAJESH (Team Lead and Developer) 
+	
+### Contact [GitHub](https://github.com/itsmrajesh)  [LinkedIn](https://linkedin.com/in/itsmrajesh/) [Twitter](https://github.com/itsmrajesh)
