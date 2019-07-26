@@ -8,7 +8,7 @@ drop table admin;
 
 create table admin(USERNAME varchar(50) primary key,PASSWORD varchar(20) not null);
 
-insert into admin values("rajesh","ebill");
+insert into admin values("admin","ebill");
 
 create table customers(CNUMBER varchar(50) primary key,CNAME varchar(70) not null,CID varchar(20) unique,MOBILE varchar(20) not null,ADDRESS varchar(150) not null);
 
