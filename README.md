@@ -1,10 +1,11 @@
 # Electric-Bill-Generator
 This is console based JDBC Application for Paying and Managing Electricity Bills.
-This application having 3 profiles 
-
+### This application having 3 profiles namely
+- Manager
+- Employee
+- Customer
 
 ### For updated docs [click here](https://github.com/itsmrajesh/Electric-Bill-Generator)
-
 
 ## Installation
 Clone this repository.
@@ -16,11 +17,11 @@ Go to dbutil folder in that open DButil.java file then change username and passw
 ``` Java
 public Connection getConnection() {
 try {
-    con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ebill?autoReconnect=true&useSSL=false", dbUserName, dbPassword);
+ connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbName?autoReconnect=true&useSSL=false", dbUserName, dbPassword);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return con;
+		return connection;
 	}
 ```
 if you have done every above steps correctly then your ready to use this project.
