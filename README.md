@@ -12,8 +12,8 @@ Clone this repository.
 This Project uses Lombok library [setup](https://www.baeldung.com/lombok-ide)
 Make sure that your eclipse is configured with lombok.
 Without lombok this project will not working use above link to download lombok and see the tutorial fix the lombok in your eclipse.
-Check out ebilldb.txt file in this repo (Folder) copy all the query in that file and paste in mysql DB command prompt then follow below steps
-Go to dbutil folder in that open DButil.java file then change username and password for DB Configuration in 
+Check out ebilldb.txt file in this repo (Folder) copy all the query in that file and paste in mysql DB command prompt then follow below steps,
+- Go to dbutil folder in that open DButil.java file then change username and password for DB Configuration in DBUtil.java file 
 ``` Java
 public Connection getConnection() {
 try {
