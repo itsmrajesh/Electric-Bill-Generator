@@ -17,7 +17,7 @@ Check out ebilldb.txt file in this repo (Folder) copy all the query in that file
 ``` Java
 public Connection getConnection() {
 try {
- connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbName?autoReconnect=true&useSSL=false", dbUserName, dbPassword);
+ connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ebill?autoReconnect=true&useSSL=false", dbUserName, dbPassword);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
